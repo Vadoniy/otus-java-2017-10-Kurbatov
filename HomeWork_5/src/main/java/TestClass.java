@@ -5,7 +5,7 @@ import annotations.Test;
 /**
  * Created by Vadoniy on 26.11.2017.
  */
-public class testClass {
+public class TestClass {
 
     @Before
     public static void testBeforeAnnotation(){
@@ -19,6 +19,16 @@ public class testClass {
 
     @Test
     public static void testTestAnnotation(){
-        System.out.println("Test Annotation Test");
+        System.out.println("Test Annotation Test " + 0);
+    }
+
+    @Test
+    public static void testTestAnnotation1(){
+        System.out.println("Test Annotation Test " + 1);
+    }
+
+    @Test
+    public static void testTestAnnotation2(){
+        System.out.println("Test Annotation Test " + 2);
     }
 }

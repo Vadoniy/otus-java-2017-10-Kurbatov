@@ -8,27 +8,27 @@ import annotations.Test;
 public class TestClass {
 
     @Before
-    public static void testBeforeAnnotation(){
+    public void testBeforeAnnotation(){
         System.out.println("Test Annotation Before");
     }
 
     @After
-    public static void testAfterAnnotation(){
+    public void testAfterAnnotation(){
         System.out.println("Test Annotation After");
     }
 
     @Test
-    public static void testTestAnnotation(){
+    public void testTestAnnotation(){
         System.out.println("Test Annotation Test " + 0);
     }
 
     @Test
-    public static void testTestAnnotation1(){
+    public void testTestAnnotation1(){
         System.out.println("Test Annotation Test " + 1);
     }
 
     @Test
-    public static void testTestAnnotation2(){
+    public void testTestAnnotation2(){
         System.out.println("Test Annotation Test " + 2);
     }
 }

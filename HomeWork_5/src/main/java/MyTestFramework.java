@@ -2,7 +2,6 @@ import annotations.After;
 import annotations.Before;
 import annotations.Test;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -15,44 +14,37 @@ public class MyTestFramework {
     private static ArrayList<Method> methodsBefore = new ArrayList<Method>();
     private static ArrayList<Method> methodsAfter = new ArrayList<Method>();
 
-    public static void testAnnotations(Class c) {
+    public static <T> void testAnnotations(Class<T> c) {
         Method[] methods = c.getMethods();
         for (Method mth : methods) {
 
             if (ReflectionHelper.checkAnnotationTest(mth, Before.class)) {
-//                System.out.println(Before.beforeTest);
                 methodsBefore.add(mth);
                 continue;
             }
             if (ReflectionHelper.checkAnnotationTest(mth, Test.class)) {
-//                System.out.println(Test.test);
                 methodsTest.add(mth);
                 continue;
             }
             if (ReflectionHelper.checkAnnotationTest(mth, After.class)) {
-//                System.out.println(After.afterTest);
                 methodsAfter.add(mth);
                 continue;
             }
         }
-        startTest();
+        startTest(c);
     }
 
-    private static void startTest(){
-        try {
-            for (Method mthTest : methodsTest){
-                for (Method mthBefore : methodsBefore){
-                    mthBefore.invoke(null, null);
-                }
-                mthTest.invoke(null, null);
-                for (Method mthAfter : methodsAfter){
-                    mthAfter.invoke(null, null);
-                }
+    private static <T> void startTest(Class<T> c){
+        for (Method mthTest : methodsTest) {
+            T testRun = ReflectionHelper.instantiate(c);
+
+            for (Method mthBefore : methodsBefore) {
+                ReflectionHelper.callMethod(testRun, mthBefore.getName(), mthBefore.getTypeParameters());
             }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (InvocationTargetException e) {
-            e.printStackTrace();
+            ReflectionHelper.callMethod(testRun, mthTest.getName(), mthTest.getTypeParameters());
+            for (Method mthAfter : methodsAfter) {
+                ReflectionHelper.callMethod(testRun, mthAfter.getName(), mthAfter.getTypeParameters());
+            }
         }
     }
 }

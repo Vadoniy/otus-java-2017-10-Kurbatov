@@ -12,22 +12,23 @@ public class ATM {
         System.out.println(WELCOME_MESSAGE);
         Scanner sc = new Scanner(System.in);
         String input = sc.nextLine();
+        ATM atm1 = new ATM();
 
         if ("1".equalsIgnoreCase(input)) {
-            provideContribution().input();
+            atm1.provideContribution().input();
         } else if ("2".equalsIgnoreCase(input)) {
-            provideWithdraw().input();
+            atm1.provideWithdraw().input();
         } else {
             System.exit(0);
         }
     }
 
 //    Factory
-    private static Procedure provideContribution(){
+    private Procedure provideContribution(){
         return new MoneyReceiver();
     }
 
-    private static Procedure provideWithdraw(){
+    private Procedure provideWithdraw(){
         return new MoneyExtradition();
     }
 }

@@ -8,7 +8,7 @@ public class MoneyReceiver implements Procedure{
             "\nEnter \"Finish\" to stop procedure, \"Cancel\" to interrupt and take money back" +
             " or \"Show\" to see you current balance.";
 
-    private static int sum = 0;
+    private int sum = 0;
 
     MoneyReceiver(){
         showWelcomeMessage();
@@ -30,7 +30,8 @@ public class MoneyReceiver implements Procedure{
                 continue;
             }
             try {
-                if (NotesChecker.checkNote(Integer.parseInt(input))){
+                NotesChecker nc = new NotesChecker();
+                if (nc.checkNote(Integer.parseInt(input))){
                     sum += Integer.parseInt(input);
                     System.out.println("Go on or finish/cancel/show.");
                 } else {

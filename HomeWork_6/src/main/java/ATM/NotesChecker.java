@@ -1,7 +1,7 @@
 package ATM;
 
 public class NotesChecker {
-    protected static boolean checkNote(int noteValue){
+    protected boolean checkNote(int noteValue){
         for (Notes note : Notes.values()){
             if (note.getValue() == noteValue){
                 return true;

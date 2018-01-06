@@ -1,7 +1,7 @@
 package ATM;
 
 
-import java.util.Scanner;
+import java.util.*;
 
 public class MoneyReceiver implements Procedure{
     private static final String WELCOME_MESSAGE = "Please, contribute notes into reciever." +
@@ -9,12 +9,17 @@ public class MoneyReceiver implements Procedure{
             " or \"Show\" to see you current balance.";
 
     private int sum = 0;
+    private List<Cell> cells = new ArrayList<Cell>();
+    private HashMap<Notes, Integer> cellsMap = new HashMap<Notes, Integer>();
 
-    MoneyReceiver(){
+    MoneyReceiver(List<Cell> c){
         showWelcomeMessage();
+        c.forEach(cell -> {
+            cellsMap.put(cell.getNote(), cell.getAmount());
+        });
     }
 
-    public void input(){
+    public List<Cell> input(){
         String input;
         while (true) {
             Scanner sc = new Scanner(System.in);
@@ -32,6 +37,15 @@ public class MoneyReceiver implements Procedure{
             try {
                 NotesChecker nc = new NotesChecker();
                 if (nc.checkNote(Integer.parseInt(input))){
+
+                    if (Objects.isNull(cellsMap.get(Notes.getNote(input)))){
+                        cellsMap.put(Notes.getNote(input),0);
+                    }
+                    int a = cellsMap.get(Notes.getNote(input));
+//                    Добавить добавление купюр, которых доселе не было в банкомате
+//                    cellsMap.put(Notes.getNote(input),0);
+                    cellsMap.put(Notes.getNote(input), ++a);
+
                     sum += Integer.parseInt(input);
                     System.out.println("Go on or finish/cancel/show.");
                 } else {
@@ -43,6 +57,11 @@ public class MoneyReceiver implements Procedure{
             }
         }
         System.out.println(sum + " of money units were contributed on your deposit.");
+        cellsMap.forEach((k, v) -> {
+            cells.add(new Cell(k,v));
+        });
+        Collections.sort(cells);
+        return cells;
     }
 
     private Balance showBalance(int sum){

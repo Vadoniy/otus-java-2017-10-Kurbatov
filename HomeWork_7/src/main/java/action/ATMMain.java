@@ -13,8 +13,11 @@ public class ATMMain {
 
     public static void main(String[] args) {
         ATM atm = new ATM(fillCells());
-        atm.welcomeMessage();
         atm.interaction(atm);
+        atm.showCellsState("initial");
+        atm.setInitialCellsState();
+        atm.showCellsState("final");
+        atm.showCellsState("initial");
     }
 
     private static List<Cell> fillCells() {

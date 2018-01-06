@@ -21,6 +21,10 @@ public class Cell implements Comparable<Cell>{
         return note.getValue();
     }
 
+    public Notes getNote(){
+        return note;
+    }
+
     public void setAmount(int amount) {
         this.amount = amount;
     }
@@ -37,5 +41,9 @@ public class Cell implements Comparable<Cell>{
             return 1;
         }
         return 0;
+    }
+
+    public String show(){
+        return String.format("%s notes %s money units per each.\n", amount, note);
     }
 }

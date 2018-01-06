@@ -6,9 +6,6 @@ public class NotesChecker {
             if (note.getValue() == noteValue){
                 return true;
             }
-            /*else if (note.ordinal() == Notes.values().length - 1){
-                throw new RuntimeException("Unknown note.");
-            }*/
         }
         return false;
     }

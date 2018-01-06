@@ -1,5 +1,7 @@
 package ATM;
 
+import java.util.List;
+
 public interface Procedure {
-    void input();
+    List<Cell> input();
 }

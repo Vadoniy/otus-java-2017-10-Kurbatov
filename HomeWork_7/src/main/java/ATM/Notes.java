@@ -17,4 +17,17 @@ public enum Notes {
     public int getValue() {
         return value;
     }
+
+    public static Notes getNote(String value){
+        switch (value){
+            case "10": return Ten;
+            case "50": return HalfHundred;
+            case "100": return OneHundred;
+            case "500": return FiveHundred;
+            case "1000": return OneThousand;
+            case "5000": return FiveThousand;
+        }
+        return null;
+    }
+
 }

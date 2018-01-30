@@ -37,12 +37,7 @@ public class JSONSerializer {
             return "";
         }
         Object object = field.get(obj);
-        Class aClass = object.getClass();
-        if (String.class.isInstance(object) || char.class.isInstance(object)){
-            return String.format("\"%s\"", object);
-        } else if (Boolean.class.isInstance(object) || aClass.isPrimitive() || Number.class.isInstance(object)){
-            return object.toString();
-        } else if (aClass.isArray() || Collection.class.isInstance(object)){
+        if (object.getClass().isArray() || Collection.class.isInstance(object)){
             StringBuilder stringBuilder = new StringBuilder();
             stringBuilder.append("[");
             List l;
@@ -52,7 +47,7 @@ public class JSONSerializer {
                 Iterator iterator = l.iterator();
 
                 while (iterator.hasNext()){
-                    stringBuilder.append(iterator.next());
+                    stringBuilder.append(stringInQuotesOrNot(iterator.next()));
                     stringBuilder.append(",");
                 }
 
@@ -64,7 +59,7 @@ public class JSONSerializer {
                 }
 
                 for (int i = 0; i<l.toArray().length; i++){
-                    stringBuilder.append(l.get(i));
+                    stringBuilder.append(stringInQuotesOrNot(l.get(i)));
                     stringBuilder.append(",");
                 }
             }
@@ -72,6 +67,16 @@ public class JSONSerializer {
             stringBuilder.delete(stringBuilder.lastIndexOf(","), stringBuilder.lastIndexOf(",")+1);
             stringBuilder.append("]");
             return stringBuilder.toString();
+        } else {
+            return stringInQuotesOrNot(object);
+        }
+    }
+
+    private String stringInQuotesOrNot(Object object){
+        if (String.class.isInstance(object) || char.class.isInstance(object)){
+            return String.format("\"%s\"", object);
+        } else if (Boolean.class.isInstance(object) || object.getClass().isPrimitive() || Number.class.isInstance(object)){
+            return object.toString();
         } else {
             return "";
         }

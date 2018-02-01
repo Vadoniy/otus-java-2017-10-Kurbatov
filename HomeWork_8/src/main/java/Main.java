@@ -1,32 +1,60 @@
-import java.util.ArrayList;
 import com.google.gson.Gson;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
 
 /**
  * Created by Vadoniy on 23.01.2018.
  */
 public class Main {
-    public static void main(String[] args) {
-        JSONSerializer js = new JSONSerializer();
-        TestObject testObject = new TestObject();
 
-        testObject.stringTest = "Vadim Kurbatov";
-        testObject.intTest = 28;
-        testObject.booleanTest = true;
-        testObject.arrayPrimitiveTest = new int[]{11,22,33,44,55};
-        testObject.arrayStringTest = new String[]{"one","two","three","four","five"};
-        testObject.listTest = new ArrayList();
-        testObject.listTest.add(0);
-        testObject.listTest.add("odin");
-        testObject.listTest.add(true);
-        testObject.floatTest = 3.14F;
+    private static JSONSerializer js;
+    private static TestObject testObject;
+    private static Gson gson;
+    private static String str1 = "String";
+    private static char ch = 'c';
 
-        System.out.println(js.toJsonString(testObject));
+    @Before
+    public void createObjects(){
+        js = new JSONSerializer();
+        testObject = new TestObject();
+        gson = new Gson();
 
-        Gson gson = new Gson();
-        System.out.println(gson.toJson(testObject));
+    }
 
-        if (js.toJsonString(testObject).equals(gson.toJson(testObject))){
-            System.out.println("Serialized correctly.");
-        }
+    @Test
+    public void testObjectsTest(){
+        Assert.assertEquals(gson.toJson(testObject), js.toJsonString(testObject));
+    }
+
+    @Test
+    public void intTest(){
+        Assert.assertEquals(gson.toJson(123), js.toJsonString(123));
+    }
+
+    @Test
+    public void floatTest(){
+        Assert.assertEquals(gson.toJson(2.3), js.toJsonString(2.3));
+    }
+
+    @Test
+    public void stringTest(){
+        Assert.assertEquals(gson.toJson(str1), js.toJsonString(str1));
+    }
+
+    @Test
+    public void charTest(){
+        Assert.assertEquals(gson.toJson(ch), js.toJsonString(ch));
+    }
+
+    @Test
+    public void booleanTest(){
+        Assert.assertEquals(gson.toJson(false), js.toJsonString(false));
+    }
+
+    @Test
+    public void nullTest(){
+        Assert.assertEquals(gson.toJson(null), js.toJsonString(null));
     }
 }

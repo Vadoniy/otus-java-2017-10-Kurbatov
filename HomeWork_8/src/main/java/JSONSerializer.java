@@ -1,4 +1,3 @@
-import java.io.Serializable;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.util.*;
@@ -8,16 +7,24 @@ import java.util.*;
  */
 public class JSONSerializer {
 
-    public String toJsonString(TestObject object){
+    public String toJsonString(Object object){
         StringBuilder sb = new StringBuilder();
 
         if (Objects.isNull(object)){
-            return sb.append("").toString();
+            return new String("null");
+        } else if (object.getClass().isPrimitive()
+                || Number.class.isInstance(object)
+                || Boolean.class.isInstance(object)){
+            return object.toString();
+        } else if (Character.class.isInstance(object)
+                || String.class.isInstance(object)){
+            return String.format("\"%s\"", object.toString());
         }
 
         sb.append("{");
         List<Field> fieldsArray = Arrays.asList(object.getClass().getDeclaredFields());
         fieldsArray.forEach(field -> {
+            field.setAccessible(true);
             try {
                 final String fieldstr = String.format("\"%s\":%s", field.getName(), getValue(field, object));
                 sb.append(fieldstr);

@@ -5,5 +5,5 @@ import java.sql.SQLException;
 
 @FunctionalInterface
 public interface ResultHandler<T> {
-     T handle(ResultSet result) throws SQLException;
+     T handle(ResultSet result) throws SQLException, NoSuchFieldException;
 }

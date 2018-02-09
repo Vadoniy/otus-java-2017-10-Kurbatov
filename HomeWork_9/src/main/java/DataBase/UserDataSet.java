@@ -11,20 +11,6 @@ public class UserDataSet extends DataSet {
         this.age = age;
     }
 
-    public UserDataSet(int id, String name, int age) {
-        super.id = id;
-        this.name = name;
-        this.age = age;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public int getAge() {
-        return age;
-    }
-
     @Override
     public String toString() {
         return "UserDataSet{" +

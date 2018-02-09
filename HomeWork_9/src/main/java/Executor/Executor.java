@@ -17,76 +17,9 @@ public class Executor {
     private static final String SELECT_USER_ID = "SELECT * FROM user WHERE id = %s";
 
     private final Connection connection;
-    private Statement statement;
 
     public Executor(Connection connection) {
         this.connection = connection;
-        try {
-            this.statement = connection.createStatement();
-        } catch (SQLException e) {
-            e.printStackTrace();
-            System.err.println("Can't create statement.");
-        }
-    }
-
-    public <T extends DataSet> void save(T dataSet){
-        try {
-            String query = generateQueryUpdate(dataSet);
-            statement.execute(query);
-        } catch (SQLException | IllegalAccessException | IllegalArgumentException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public <T extends DataSet> T load(long id, Class<T> clazz) throws NoSuchFieldException {
-        T dataSet = null;
-        try {
-            dataSet = clazz.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        String name = "";
-        int age = 0;
-
-        try {
-            ResultSet resultSet = statement.executeQuery(generateQuerySelect(id));
-
-            while (resultSet.next()){
-                name = resultSet.getString("name");
-                age = resultSet.getInt("age");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        List<Field> fieldList = new ArrayList<>();
-        fieldList.add(clazz.getSuperclass().getDeclaredField("id"));
-
-        for (Field field : dataSet.getClass().getDeclaredFields()){
-            fieldList.add(field);
-        }
-
-        try{
-            for (Field field : fieldList){
-                field.setAccessible(true);
-                switch (field.getName()){
-                    case "id":
-                        field.set(dataSet, id);
-                        continue;
-                    case "name":
-                        field.set(dataSet, name);
-                        continue;
-                    case "age":
-                        field.set(dataSet, age);
-                        continue;
-                }
-            }
-        } catch (IllegalAccessException e){
-            e.printStackTrace();
-        }
-
-        return dataSet;
     }
 
     public void execQuery (String query) throws SQLException {
@@ -95,7 +28,7 @@ public class Executor {
         }
     }
 
-    public <T> T execQuery (String query, ResultHandler<T> resultHandler) throws SQLException {
+    public <T> T execQuery (String query, ResultHandler<T> resultHandler) throws SQLException, NoSuchFieldException {
         try (Statement stmt = connection.createStatement()){
             stmt.execute(query);
             ResultSet resultSet = stmt.getResultSet();
@@ -103,7 +36,8 @@ public class Executor {
         }
     }
 
-    private String generateQueryUpdate(DataSet dataSet) throws IllegalAccessException {
+    public String generateQueryUpdate(DataSet dataSet) throws IllegalAccessException {
+
         List<Field> fields = new ArrayList<>(Arrays.asList(dataSet.getClass().getDeclaredFields()));
         String name = "";
         int age = 0;
@@ -121,7 +55,7 @@ public class Executor {
         return String.format(INSERT_INTO_USER, name, age);
     }
 
-    private String generateQuerySelect(long id){
+    public String generateQuerySelect(long id){
         return String.format(SELECT_USER_ID, id);
     }
 }

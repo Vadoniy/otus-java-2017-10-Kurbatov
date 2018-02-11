@@ -13,8 +13,10 @@ import java.util.List;
 
 public class Executor {
 
-    private static final String INSERT_INTO_USER = "INSERT INTO user (name, age) VALUES ('%s', '%s')";
+    private static StringBuilder INSERT_INTO_USER = new StringBuilder("INSERT INTO user (");
+    private static StringBuilder INSERT_VALUES = new StringBuilder(") VALUES (");
     private static final String SELECT_USER_ID = "SELECT * FROM user WHERE id = %s";
+    private static final String COMMA = ", ";
 
     private final Connection connection;
 
@@ -36,23 +38,30 @@ public class Executor {
         }
     }
 
+
     public String generateQueryUpdate(DataSet dataSet) throws IllegalAccessException {
 
         List<Field> fields = new ArrayList<>(Arrays.asList(dataSet.getClass().getDeclaredFields()));
-        String name = "";
-        int age = 0;
+
         for (Field field : fields){
             field.setAccessible(true);
-            switch (field.getName()){
-                case "name":
-                    name = (String)field.get(dataSet);
-                    continue;
-                case "age":
-                    age = field.getInt(dataSet);
-                    continue;
+            INSERT_INTO_USER.append(field.getName());
+            INSERT_INTO_USER.append(COMMA);
+            INSERT_VALUES.append('\'');
+            INSERT_VALUES.append(field.get(dataSet));
+            INSERT_VALUES.append('\'');
+            INSERT_VALUES.append(COMMA);
             }
-        }
-        return String.format(INSERT_INTO_USER, name, age);
+
+        INSERT_INTO_USER.deleteCharAt(INSERT_INTO_USER.lastIndexOf(COMMA));
+        INSERT_VALUES.deleteCharAt(INSERT_VALUES.lastIndexOf(COMMA));
+        INSERT_INTO_USER.append(INSERT_VALUES);
+        INSERT_INTO_USER.append(")");
+        String query = INSERT_INTO_USER.toString();
+        INSERT_INTO_USER = new StringBuilder("INSERT INTO user (");
+        INSERT_VALUES = new StringBuilder(") VALUES (");
+
+        return query;
     }
 
     public String generateQuerySelect(long id){

@@ -17,7 +17,6 @@ public class DBServiceImpl implements DBService {
     private static final String DROP_TABLE = "DROP TABLE user";
 
     private final Connection connection;
-    private final Statement statement;
 
     private String metaData = "Connected to: %s\n" +
             "DB name: %s\n" +
@@ -26,7 +25,6 @@ public class DBServiceImpl implements DBService {
 
     public DBServiceImpl() throws SQLException {
         this.connection = ConnectionHelper.getConnection();
-        this.statement = connection.createStatement();
     }
 
     @Override
@@ -67,7 +65,16 @@ public class DBServiceImpl implements DBService {
     public <T extends DataSet> void save(T dataSet){
         try {
             String query = new Executor(connection).generateQueryUpdate(dataSet);
-            statement.execute(query);
+            PreparedStatement preparedStatement = connection.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+            preparedStatement.execute();
+
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+
+            while (generatedKeys.next()){
+                dataSet.setId(generatedKeys.getInt(1));
+            }
+
+            preparedStatement.close();
         } catch (SQLException | IllegalAccessException | IllegalArgumentException e) {
             e.printStackTrace();
         }
@@ -87,13 +94,15 @@ public class DBServiceImpl implements DBService {
             List<Field> fieldList = new ArrayList<>();
             fieldList.addAll(Arrays.asList(clazz.getSuperclass().getDeclaredFields()));
             fieldList.addAll(Arrays.asList(clazz.getDeclaredFields()));
-            ResultSet resultSet = statement.executeQuery(executor.generateQuerySelect(id));
+            PreparedStatement preparedStatement = connection.prepareStatement(executor.generateQuerySelect(id));
+            ResultSet resultSet = preparedStatement.executeQuery();
             resultSet.next();
             for (Field field : fieldList){
                 field.setAccessible(true);
                 field.set(dataSet, resultSet.getObject(field.getName()));
             }
 
+            preparedStatement.close();
         } catch (SQLException | IllegalAccessException e) {
             e.printStackTrace();
         }

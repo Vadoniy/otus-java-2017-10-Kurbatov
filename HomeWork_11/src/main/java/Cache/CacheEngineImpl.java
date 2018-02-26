@@ -12,7 +12,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine {
     private final long idleTimeMs;
     private final boolean isEternal; //should we carry about time or not
 
-    private final Map<K, Element<K, V>> elements = new HashMap<K, Element<K, V>>();
+    private final Map<K, SoftReference<Element<K, V>>> elements = new HashMap<>();
     private final Timer timer = new Timer();
 
     private int hit = 0;
@@ -36,7 +36,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine {
         }
 
         K key = (K) element.getKey();
-        elements.put(key, element);
+        elements.put(key, new SoftReference<>(element));
 
         if (!isEternal){
             if (lifeTimeMs != 0){
@@ -52,18 +52,19 @@ public class CacheEngineImpl<K, V> implements CacheEngine {
 
     @Override
     public V get(Object key) {
-        SoftReference<Element> softReference = new SoftReference<>(elements.get(key));
-        Element softElement = softReference.get();
-        if (Objects.isNull(softElement)){
+
+        SoftReference<Element<K, V>> softReference = elements.get(key);
+
+        if (Objects.isNull(softReference)){
             miss++;
             return null;
         } else {
+            Element<K, V> softElement = softReference.get();
             hit++;
             softElement.setAccessed();
             return (V) softElement.getValue();
         }
     }
-
 
     public int getHitCount() {
         return hit;
@@ -81,7 +82,7 @@ public class CacheEngineImpl<K, V> implements CacheEngine {
         return new TimerTask() {
             @Override
             public void run() {
-                Element<K, V> element = elements.get(key);
+                Element<K, V> element = elements.get(key).get();
                 if (element == null || isT1BeforeT2(timeFunction.apply(element), System.currentTimeMillis())) {
                     elements.remove(key);
                     this.cancel();

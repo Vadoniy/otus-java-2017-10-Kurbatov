@@ -68,7 +68,7 @@ public class DBServiceHibernateImpl implements DBService {
 
             if (Objects.isNull(userDataSet)){
                 userDataSet = getUserDataSetById(id);
-                System.out.println(String.format("Cache was empty, data recieved from DB. Cache data was updated with id %s", id));
+                System.out.println(String.format("Cache was empty, data received from DB. Cache data was updated with id %s", id));
                 cacheEngine.put(new Element(id, userDataSet));
                 return userDataSet;
             } else {

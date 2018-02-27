@@ -1,5 +1,7 @@
 package Cache;
 
+import com.sun.istack.internal.NotNull;
+
 import java.lang.ref.SoftReference;
 import java.util.*;
 import java.util.function.Function;
@@ -52,18 +54,20 @@ public class CacheEngineImpl<K, V> implements CacheEngine {
 
     @Override
     public V get(Object key) {
-
         SoftReference<Element<K, V>> softReference = elements.get(key);
 
-        if (Objects.isNull(softReference)){
-            miss++;
-            return null;
-        } else {
+        if (!Objects.isNull(softReference)){
             Element<K, V> softElement = softReference.get();
-            hit++;
-            softElement.setAccessed();
-            return (V) softElement.getValue();
+
+            if (!Objects.isNull(softElement)){
+                hit++;
+                softElement.setAccessed();
+                return (V) softElement.getValue();
+            }
         }
+
+        miss++;
+        return null;
     }
 
     public int getHitCount() {

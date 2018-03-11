@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -19,8 +20,11 @@ public class MultiSorting {
         List<Thread> listOfThr = new ArrayList<>();
         listOfArr.addAll(createArraysList(subLength));
         listOfThr.addAll(createThreadsList(listOfArr));
-        startAndJoin(listOfThr);
-        return merge(merge(listOfArr.get(0), listOfArr.get(1)),merge(listOfArr.get(2), listOfArr.get(3)));
+        StartThread starter = new StartThread(listOfThr);
+        starter.run();
+        MergeThread merger = new MergeThread(listOfArr);
+        merger.run();
+        return merge(listOfArr);
     }
 
     public void show(int[] array){
@@ -32,47 +36,18 @@ public class MultiSorting {
         System.out.println(sb);
     }
 
-    private static int[] merge(int[] array1, int[] array2) {
-        int length1 = array1.length;
-        int length2 = array2.length;
-        int commonLength = length1 + length2;
-        int[] sortedArray = new int[commonLength];
-
-        int i = 0;
-        int j = 0;
-        int k = 0;
-        while (i<commonLength){
-            if (j<length1 && k<length2) {
-
-                if (array1[j] < array2[k]) {
-                    sortedArray[i] = array1[j];
-                    j++;
-                } else {
-                    sortedArray[i] = array2[k];
-                    k++;
-                }
-            } else if (j<length1){
-                sortedArray[i] = array1[j];
-                j++;
-            } else {
-                sortedArray[i] = array2[k];
-                k++;
-            }
-            i++;
+    private static int[] merge(List<int[]> list) {
+        int resultLength = 0;
+        for (int[] array : list){
+            resultLength += array.length;
         }
-
-        return sortedArray;
-    }
-
-    private static void startAndJoin(List<Thread> threads){
-        threads.forEach(thread -> {
-            try {
-                thread.start();
-                thread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
+        int[] result = new int[resultLength];
+        int position = 0;
+        for (int[] array : list){
+            System.arraycopy(array, 0, result, position, array.length);
+            position += array.length;
+        }
+        return result;
     }
 
     private List<int[]> createArraysList(int subLength){

@@ -14,26 +14,26 @@ import java.util.Arrays;
 public class MultiSortingTest {
 
     private static int[] testArray;
-    private static MultiSorting multiSort;
-    private static int[] multiSorted;
+    private static MultiSorting multiSorter;
+    private static int[] multiSortedArray;
 
     @Before
     public void prepare(){
         testArray = generateArray(10);
-        multiSort = new MultiSorting(testArray);
-        multiSorted = multiSort.sort();
+        multiSorter = new MultiSorting(testArray);
+        multiSortedArray = multiSorter.sort();
         Arrays.sort(testArray);
     }
 
     @Test
     public void compareSortings(){
-        Assert.assertArrayEquals(testArray, multiSorted);
+        Assert.assertArrayEquals(testArray, multiSortedArray);
     }
 
     @Before
     public void clean(){
-        multiSort = null;
-        multiSorted = null;
+        multiSorter = null;
+        multiSortedArray = null;
         System.gc();
     }
 

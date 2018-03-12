@@ -4,6 +4,7 @@ import java.util.List;
 /**
  * Created by Vadoniy on 09.03.2018.
  */
+@Deprecated
 public class StartThread extends Thread {
     private List<Thread> threads = new ArrayList<>();
 

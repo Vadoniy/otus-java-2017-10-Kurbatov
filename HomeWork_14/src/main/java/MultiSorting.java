@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -20,8 +19,7 @@ public class MultiSorting {
         List<Thread> listOfThr = new ArrayList<>();
         listOfArr.addAll(createArraysList(subLength));
         listOfThr.addAll(createThreadsList(listOfArr));
-        StartThread starter = new StartThread(listOfThr);
-        starter.run();
+        startThreads(listOfThr);
         MergeThread merger = new MergeThread(listOfArr);
         merger.run();
         return merge(listOfArr);
@@ -34,6 +32,19 @@ public class MultiSorting {
             sb.append(String.format(" %s;", t));
         }
         System.out.println(sb);
+    }
+
+    private static void startThreads(List<Thread> threads){
+        threads.forEach(thread -> thread.start());
+        threads.forEach(thread -> {
+            if (thread.isAlive()) {
+                try {
+                    thread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     private static int[] merge(List<int[]> list) {

@@ -19,7 +19,7 @@ public class MultiSortingTest {
 
     @Before
     public void prepare(){
-        testArray = generateArray(10);
+        testArray = generateArray(20001);
         multiSorter = new MultiSorting(testArray);
         multiSortedArray = multiSorter.sort();
         Arrays.sort(testArray);

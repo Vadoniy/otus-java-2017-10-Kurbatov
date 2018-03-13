@@ -4,6 +4,7 @@ import java.util.List;
 /**
  * Created by Vadoniy on 09.03.2018.
  */
+@Deprecated
 public class MergeThread extends Thread {
     private List<int[]> listOfArrays = new ArrayList<>();
 

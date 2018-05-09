@@ -16,4 +16,5 @@ public interface DBService {
     UserDataSet readByName(String name);
 
     void shutdown();
+
 }

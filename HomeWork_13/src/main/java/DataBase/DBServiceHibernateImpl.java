@@ -92,6 +92,10 @@ public class DBServiceHibernateImpl implements DBService {
         }
     }
 
+    public CacheEngine getCache(){
+        return cacheEngine;
+    }
+
     private UserDataSet getUserDataSetById(long id) {
         UserDataSet userDataSet;
         userDataSet = runInSession(session -> {

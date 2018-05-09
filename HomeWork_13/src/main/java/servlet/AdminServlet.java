@@ -1,8 +1,8 @@
 package servlet;
 
 import Cache.CacheEngine;
-import DataSet.DataSet;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.servlet.http.HttpServlet;
@@ -16,15 +16,11 @@ import static servlet.Constants.*;
 
 public class AdminServlet extends HttpServlet {
 
-//    public AdminServlet(CacheEngine<Long, DataSet> cacheEngine){
-//        this.cacheEngine = cacheEngine;
-//    }
-
-    @Autowired
-    private CacheEngine cacheEngine = null;
+    private CacheEngine cacheEngine;
 
     public AdminServlet(){
-        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+        ApplicationContext context = new ClassPathXmlApplicationContext("spring.xml");
+        cacheEngine = (CacheEngine) context.getBean("cacheEngine");
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {

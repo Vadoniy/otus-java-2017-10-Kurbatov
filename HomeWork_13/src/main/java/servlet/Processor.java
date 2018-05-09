@@ -20,6 +20,7 @@ public class Processor {
 
     private Processor() {
         configuration = new Configuration();
+        configuration.setClassForTemplateLoading(this.getClass(), "/tml/");
     }
 
     static Processor instance() {
@@ -28,7 +29,7 @@ public class Processor {
 
     String getPage(String filename, Map<String, Object> data) throws IOException {
         try (Writer stream = new StringWriter()) {
-            Template template = configuration.getTemplate(HTML_DIR + File.separator + filename);
+            Template template = configuration.getTemplate(filename);
             template.process(data, stream);
             return stream.toString();
         } catch (TemplateException e) {

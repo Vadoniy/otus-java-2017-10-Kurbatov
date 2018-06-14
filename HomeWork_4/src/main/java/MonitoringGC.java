@@ -9,7 +9,7 @@ public class MonitoringGC implements Runnable {
 
     private static String pathToFile = "./logs/GC.log";
     private static File file = new File(pathToFile);
-    private static int perMinute = 5000;
+    private static int perMinute = 60000;
 
     private static String gcName;
     private static long gcPerMinute;

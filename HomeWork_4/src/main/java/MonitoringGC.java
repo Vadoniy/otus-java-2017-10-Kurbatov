@@ -1,24 +1,60 @@
-import javax.management.ListenerNotFoundException;
-import javax.management.NotificationEmitter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 
-public class MonitoringGC {
+public class MonitoringGC implements Runnable {
 
-    private static GCInformer gcInformer = new GCInformer();
+    private static String pathToFile = "./logs/GC.log";
+    private static File file = new File(pathToFile);
+    private static int perMinute = 5000;
 
-    public static void startGCMonitor() {
-        for(GarbageCollectorMXBean mBean: ManagementFactory.getGarbageCollectorMXBeans()) {
-            ((NotificationEmitter) mBean).addNotificationListener(gcInformer, null, null);
+    private static String gcName;
+    private static long gcPerMinute;
+    private static long gcTimePerMinute;
+
+    @Override
+    public void run() {
+        if (file.exists()) {
+            file.delete();
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        while (true){
+            try{
+                Thread.sleep(perMinute);
+                collectStats();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
         }
     }
 
-    public static void stopGCMonitor() {
-        for(GarbageCollectorMXBean mBean: ManagementFactory.getGarbageCollectorMXBeans()) {
-            try {
-                ((NotificationEmitter) mBean).removeNotificationListener(gcInformer);
-            } catch(ListenerNotFoundException e) {
+    private void collectStats(){
+        try (FileWriter writer = new FileWriter(file, true)) {
+            for (GarbageCollectorMXBean mBean : ManagementFactory.getGarbageCollectorMXBeans()) {
+                gcName = mBean.getName();
+                gcPerMinute = mBean.getCollectionCount();
+                gcTimePerMinute = mBean.getCollectionTime();
+
+                System.out.println();
+                System.out.println("GC name: " + gcName);
+                System.out.println("GC per minute: " + gcPerMinute);
+                System.out.println("GC time per minute: " + gcTimePerMinute);
+                System.out.println();
+
+
+                writer.write("GC name: " + gcName + "\n");
+                writer.write("GC per minute: " + gcPerMinute + "\n");
+                writer.write("GC time per minute: " + gcTimePerMinute + "\n");
             }
+        } catch(IOException e){
+            e.printStackTrace();
         }
     }
 }

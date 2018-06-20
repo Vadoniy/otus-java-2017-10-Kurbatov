@@ -1,7 +1,10 @@
+import gcTools.MonitoringGC;
+import objectsTools.ObjectsCreator;
+
 public class Main {
 
-    static MonitoringGC mc = new MonitoringGC();
-    static ObjectsCreator oc = new ObjectsCreator();
+    private static final MonitoringGC mc = new MonitoringGC();
+    private static final ObjectsCreator oc = new ObjectsCreator();
 
     public static void main(String[] args) {
         new Thread(oc).start();

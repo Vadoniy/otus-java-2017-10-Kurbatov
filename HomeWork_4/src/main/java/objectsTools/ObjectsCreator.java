@@ -2,7 +2,7 @@ package objectsTools;
 
 public class ObjectsCreator implements Runnable{
 
-    private static final int SIZE = 7_000_000;
+    private static final int SIZE = 3_500_000;
 
     private final Object[] array = new Object[SIZE];
 

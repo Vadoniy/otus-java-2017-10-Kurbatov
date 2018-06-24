@@ -2,6 +2,7 @@ package gcTools;
 
 import org.apache.log4j.Logger;
 
+import javax.management.NotificationEmitter;
 import java.lang.management.GarbageCollectorMXBean;
 import java.lang.management.ManagementFactory;
 
@@ -11,18 +12,16 @@ public class MonitoringGC implements Runnable {
 
     static Logger log = Logger.getLogger(MonitoringGC.class);
 
-    private static String gcName;
+    private static String gcYoungName;
+    private static String gcOldName;
     private static long gcPerMinuteYoung;
     private static long gcTimePerMinuteYoung;
 
     private static long gcPerMinuteOld;
     private static long gcTimePerMinuteOld;
 
-    private static long gcPreviousMinuteYoung;
-    private static long gcTimePreviousMinuteYoung;
-
-    private static long gcPreviousMinuteOld;
-    private static long gcTimePreviousMinuteOld;
+    private GCInformer gcInformer = new GCInformer();
+    private String gcType = "";
 
     @Override
     public void run() {
@@ -30,8 +29,13 @@ public class MonitoringGC implements Runnable {
 
         while (true){
             try{
-                Thread.sleep(PER_MINUTE);
                 collectStats();
+                logInfo(gcYoungName, gcOldName, gcPerMinuteYoung, gcPerMinuteOld, gcTimePerMinuteYoung, gcTimePerMinuteOld);
+                gcPerMinuteYoung = 0;
+                gcPerMinuteOld = 0;
+                gcTimePerMinuteYoung = 0;
+                gcTimePerMinuteOld = 0;
+                Thread.sleep(PER_MINUTE);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -39,37 +43,35 @@ public class MonitoringGC implements Runnable {
     }
 
     private void collectStats(){
+
         for (GarbageCollectorMXBean mBean : ManagementFactory.getGarbageCollectorMXBeans()) {
 
-            gcName = mBean.getName();
+            NotificationEmitter emitter = (NotificationEmitter) mBean;
 
-            if(gcName.contains("Young")){
-                gcPerMinuteYoung = mBean.getCollectionCount() - gcPreviousMinuteYoung;
-                gcPreviousMinuteYoung = gcPerMinuteYoung;
-                gcTimePerMinuteYoung = mBean.getCollectionTime() - gcTimePreviousMinuteYoung;
-                gcTimePreviousMinuteYoung = gcTimePerMinuteYoung;
+            emitter.addNotificationListener(gcInformer, null, null);
 
-                logInfo(gcName, gcPerMinuteYoung, gcTimePerMinuteYoung);
+            gcType = gcInformer.getGCType();
 
-                gcPerMinuteYoung = 0;
-                gcTimePerMinuteYoung = 0;
-            } else if(gcName.contains("Old")){
-                gcPerMinuteOld = mBean.getCollectionCount() - gcPreviousMinuteOld;
-                gcPreviousMinuteOld = gcPerMinuteOld;
-                gcTimePerMinuteOld = mBean.getCollectionTime() - gcTimePreviousMinuteOld;
-                gcTimePreviousMinuteOld = gcTimePerMinuteOld;
-
-                logInfo(gcName, gcPerMinuteOld, gcTimePerMinuteOld);
-
-                gcPerMinuteOld = 0;
-                gcTimePerMinuteOld = 0;
+            if(gcType.contains("minor")){
+                gcYoungName = gcInformer.getGcName();
+                gcPerMinuteYoung++;
+                gcTimePerMinuteYoung += gcInformer.gcTime();
+            } else if(gcType.contains("major")){
+                gcOldName = gcInformer.getGcName();
+                gcPerMinuteOld++;
+                gcTimePerMinuteOld += gcInformer.gcTime();
             }
         }
     }
 
-    private static void logInfo(String gcName, long gcPerMinute, long gcTimePerMinute){
-        log.info("GC name: " + gcName);
-        log.info("GC per minute: " + gcPerMinute + " times.");
-        log.info("GC time per minute: " + gcTimePerMinute + " milliseconds.\n");
+    private static void logInfo(String gcYoungName, String gcOldName, long gcYoungPerMinute, long gcOldPerMinute,
+                                long gcYoungTimePerMinute, long gcOldTimePerMinute){
+        log.info("Young GC name: " + gcYoungName);
+        log.info("Young GC per minute: " + gcYoungPerMinute + " times.");
+        log.info("Young GC times per minute: " + gcYoungTimePerMinute + " milliseconds.\n");
+
+        log.info("Old GC name: " + gcOldName);
+        log.info("Old GC per minute: " + gcOldPerMinute + " times.");
+        log.info("Old GC times per minute: " + gcOldTimePerMinute + " milliseconds.\n");
     }
 }

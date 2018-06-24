@@ -1,3 +1,5 @@
+package main;
+
 import gcTools.MonitoringGC;
 import objectsTools.ObjectsCreator;
 
